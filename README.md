@@ -5,7 +5,9 @@ Jarvis worker is an intelligent worker process that pings third party like 3comm
 
 Cronjob that runs once a minute. 
 
-* The job loops through a config file with api details from 3commas, slack channel api, slack channel name
+* The job loops through a config file with api details from 3commas, slack channel api, slack channel name. connections is used for each connection you want to establish. I have
+a history channel of all my history for a bot, and I also have a profit channel for every profit done by the bot. I hate logging into 3commas and refreshing just to see my stats, I'd like to have it in slack right here. Been nice to have these alerts go off while snowboarding, etc.
+
 `config.example.json`
 ```
 {
@@ -21,6 +23,11 @@ Cronjob that runs once a minute.
                 "source": "3commas",
                 "destination": "slack",
                 "channelName": "history"
+            },{
+                "connection": "profit",
+                "source": "3commas",
+                "destination": "slack",
+                "channelName": "profit"
             }]
         }
     ]
