@@ -11,11 +11,17 @@ Cronjob that runs once a minute.
 {
     "users": [
         {
-            "3commasApiKey": "safdadsf",
-            "3commasSecret": "fasdsadf",
-            "slackApiKey": "asdfasdfas",
-            "slackSecret": "asldkfjasdf",
-            "botId": 5671,
+            "3commasApiKey": "...",
+            "3commasSecret": "...",
+            "slackApiKey": "...",
+            "slackSecret": "...",
+            "botId": 2786356,
+            "connections": [{
+                "connection": "history",
+                "source": "3commas",
+                "destination": "slack",
+                "channelName": "history"
+            }]
         }
     ]
 }
