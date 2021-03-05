@@ -9,7 +9,7 @@ Cronjob that runs once a minute.
 `config.example.json`
 ```
 {
-    users: [
+    "users": [
         {
             "3commasApiKey": "safdadsf",
             "3commasSecret": "fasdsadf",
@@ -24,8 +24,10 @@ Cronjob that runs once a minute.
 `lastRan.json`
 ```
 {
-    "user1_api_key_goes_here_ababababab" : new Date(),
-    "user2_api_key_goes_here_ababababab" : new Date()
+    "users": [{
+        "user1_api_key_goes_here_ababababab" : new Date(),
+        "user2_api_key_goes_here_ababababab" : new Date()
+    }]
 }
 ```
 * The job calls 3commas api deals history per each user. 

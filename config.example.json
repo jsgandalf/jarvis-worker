@@ -1,0 +1,11 @@
+{
+    "users": [
+        {
+            "3commasApiKey": "safdadsf",
+            "3commasSecret": "fasdsadf",
+            "slackApiKey": "asdfasdfas",
+            "slackSecret": "asldkfjasdf",
+            "botId": 5671
+        }
+    ]
+}
