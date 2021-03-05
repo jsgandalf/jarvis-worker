@@ -1,0 +1,19 @@
+{
+  "name": "jarvis-worker",
+  "version": "1.0.0",
+  "description": "Jarvis worker is an intelligent worker process that pings third party like 3commas and passes data to integrations like zapier, slack, or database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsgandalf/jarvis-worker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jsgandalf/jarvis-worker/issues"
+  },
+  "homepage": "https://github.com/jsgandalf/jarvis-worker#readme"
+}
