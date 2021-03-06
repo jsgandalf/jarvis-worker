@@ -51,6 +51,10 @@ const sendToSlackHistory = (message:string, channel:string, slackToken:string) =
     return sendSlackMessage(message, channel, slackToken);
 }
 
+const updateLastRun = (event, key) => {
+    database.lastRun.set(key, new Date(event.created_at));
+}
+
 const runMinuteJob = (config:ConfigFile) => () => {
     console.log('run minute job ', new Date())
     config.users.forEach((userConfig:UserConfig) => {
@@ -82,10 +86,10 @@ const runMinuteJob = (config:ConfigFile) => () => {
                             && connection.destination === 'slack'
                             && connection.channelName === 'history') {
                                 sendToSlackHistory(event.message, connection.channelName, user.slackToken).then((data: any)=>{
-
+                                    updateLastRun(event, key);
                                 }).catch((e: any) => {
                                     console.error(e);
-                                });;
+                                });
                         }
                         if(connection.connection === 'profit'
                             && connection.source === '3commas'
@@ -93,7 +97,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
                             && connection.channelName === 'profit'
                             && event.message.search('#profit') !== -1) {
                                 sendToSlackProfit(event.message, connection.channelName, user.slackToken).then((data)=>{
-
+                                    updateLastRun(event, key);
                                 }).catch((e) => {
                                     console.error(e);
                                 });
@@ -103,8 +107,14 @@ const runMinuteJob = (config:ConfigFile) => () => {
         });
     });
 }
-
+/* TODO: write a test to make sure this runs */
+const test = () => {
+    const lastEvent = {
+        created_at: new Date(Date.UTC(2021, 2, 7, -7, 0, 0))
+    }
+}
 
 console.log("deploying jarvis worker");
 setInterval(runMinuteJob(config), interval);
 runMinuteJob(config)()
+
