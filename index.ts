@@ -53,7 +53,6 @@ const sendToSlackHistory = (message:string, channel:string, slackToken:string) =
 
 const runMinuteJob = (config:ConfigFile) => () => {
     console.log('run minute job ', new Date())
-    console.log('last Run ', database.lastRun);
     config.users.forEach((userConfig:UserConfig) => {
         const user = new User(userConfig);
         const api = new threeCommasAPI({
@@ -68,6 +67,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
             const lastEvent = data.bot_events[0];
             const key = user.commasApiKey + String(user.botId);
             let lastRunDate = database.lastRun.get(key);
+            console.log(`lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
                 lastRunDate = new Date(lastEvent.created_at)
                 database.lastRun.set(key, new Date(lastEvent.created_at));
