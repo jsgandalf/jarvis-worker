@@ -11,7 +11,7 @@ import cron from 'node-cron';
 
 
 import threeCommasAPI from './commas';
-const version = '1.0.6';
+const version = '1.0.7';
 
 
 const getProfit = (message:string) => {
