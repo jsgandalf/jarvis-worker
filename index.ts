@@ -49,7 +49,7 @@ const sendToSlackHistory = (message:string, channel:string, slackToken:string) =
 }
 
 const runMinuteJob = (config:ConfigFile) => () => {
-    console.log('run minute job')
+    console.log('run minute job ', new Date())
     config.users.forEach((userConfig:UserConfig) => {
         const user = new User(userConfig);
         const api = new threeCommasAPI({
@@ -95,7 +95,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
     });
 }
 
-defineLastRun(config);
-
-//setInterval(runMinuteJob(config), interval);
-runMinuteJob(config)()
+//defineLastRun(config);
+console.log("deploying jarvis worker");
+setInterval(runMinuteJob(config), interval);
+//runMinuteJob(config)()
