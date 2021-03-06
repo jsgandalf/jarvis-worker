@@ -10,8 +10,8 @@ import database from './database';
 
 import threeCommasAPI from './commas';
 import { stringify } from 'querystring';
-const interval = 1000*10;
-const version = 1.1;
+const interval = 1000*30;
+const version = 1.3;
 
 
 const getProfit = (message:string) => {

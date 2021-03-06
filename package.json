@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.ts",
-    "start": "node ./build",
+    "start": "node ./build/index.js",
     "gcp-build": "tsc -p .",
     "build": "tsc -p ."
   },
