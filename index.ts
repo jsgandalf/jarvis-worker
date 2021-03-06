@@ -6,9 +6,12 @@ import UserConfig from './user/UserConfig';
 import Connection from './user/Connection';
 import defineLastRun from './lastRun/defineLastRun';
 import sendSlackMessage from './slack';
+import database from './database';
 
-const threeCommasAPI = require('./commas/');
-const interval = 1000*30;
+import threeCommasAPI from './commas';
+import { stringify } from 'querystring';
+const interval = 1000*10;
+
 
 const getProfit = (message:string) => {
     const regex = /\+(.*?)USD/gm;
@@ -50,19 +53,25 @@ const sendToSlackHistory = (message:string, channel:string, slackToken:string) =
 
 const runMinuteJob = (config:ConfigFile) => () => {
     console.log('run minute job ', new Date())
+    console.log('last Run ', database.lastRun);
     config.users.forEach((userConfig:UserConfig) => {
         const user = new User(userConfig);
         const api = new threeCommasAPI({
             apiKey: user.commasApiKey,
             apiSecret: user.commasSecret,
         });
-        const lastRunDate = new Date(user.getLastDate()).valueOf();
-        user.setLastRun();
-        console.log('calling bot show')
+        
         api.botShow({
             bot_id:user.botId,
             include_events: true
         }).then((data: any) => {
+            const lastEvent = data.bot_events[0];
+            const key = user.commasApiKey + String(user.botId);
+            let lastRunDate = database.lastRun.get(key);
+            if (!lastRunDate) {
+                lastRunDate = new Date(lastEvent.created_at)
+                database.lastRun.set(key, new Date(lastEvent.created_at));
+            }
             const botEvents = data.bot_events
                 .filter((e:any) =>  new Date(e.created_at).valueOf() > lastRunDate)
                 .reverse();
@@ -95,7 +104,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
     });
 }
 
-//defineLastRun(config);
+
 console.log("deploying jarvis worker");
 setInterval(runMinuteJob(config), interval);
-//runMinuteJob(config)()
+runMinuteJob(config)()
