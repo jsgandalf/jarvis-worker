@@ -57,7 +57,7 @@ const updateLastRun = (event, key) => {
     database.lastRun.set(key, new Date(event.created_at));
 }
 
-const runMinuteJob = (config:ConfigFile) => () => {
+const runJob = (config:ConfigFile) => () => {
     config.users.forEach((userConfig:UserConfig) => {
         const user = new User(userConfig);
         const api = new threeCommasAPI({
@@ -72,7 +72,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
             const lastEvent = data.bot_events[0];
             const key = user.commasApiKey + String(user.botId);
             let lastRunDate = database.lastRun.get(key);
-            console.log(`${version} lastRunDate=${lastRunDate}`);
+            console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
                 lastRunDate = new Date(lastEvent.created_at)
                 database.lastRun.set(key, new Date(lastEvent.created_at));
@@ -115,15 +115,13 @@ const test = () => {
     }
 }
 
-console.log(`deploying jarvis worker ${version}`);
-//setInterval(runMinuteJob(config), interval);
-//runMinuteJob(config)();
+console.log(`deploying jarvis worker v${version}`);
 
 const app = express();
 
 // Schedule tasks to be run on the server.
-cron.schedule('* * * * * *', function() {
-    console.log('running a task every minute');
+cron.schedule('30 * * * * *', () => {
+    runJob(config);
 });
 
 app.listen(3000);
