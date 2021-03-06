@@ -73,7 +73,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
                 database.lastRun.set(key, new Date(lastEvent.created_at));
             }
             const botEvents = data.bot_events
-                .filter((e:any) =>  new Date(e.created_at).valueOf() > lastRunDate)
+                .filter((e:any) =>  new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
                 .reverse();
                 botEvents.forEach((event: any) => {
                     user.connections.forEach((connection: Connection) => {
