@@ -115,6 +115,6 @@ const test = () => {
 }
 
 console.log(`deploying jarvis worker ${version}`);
-setInterval(runMinuteJob(config), interval);
-runMinuteJob(config)()
+//setInterval(runMinuteJob(config), interval);
+runMinuteJob(config)();
 
