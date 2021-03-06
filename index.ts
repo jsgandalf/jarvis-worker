@@ -58,6 +58,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
         });
         const lastRunDate = new Date(user.getLastDate()).valueOf();
         user.setLastRun();
+        console.log('calling bot show')
         api.botShow({
             bot_id:user.botId,
             include_events: true
@@ -65,7 +66,6 @@ const runMinuteJob = (config:ConfigFile) => () => {
             const botEvents = data.bot_events
                 .filter((e:any) =>  new Date(e.created_at).valueOf() > lastRunDate)
                 .reverse();
-            
                 botEvents.forEach((event: any) => {
                     user.connections.forEach((connection: Connection) => {
                         if(connection.connection === 'history'
@@ -97,5 +97,5 @@ const runMinuteJob = (config:ConfigFile) => () => {
 
 defineLastRun(config);
 
-setInterval(runMinuteJob(config), interval);
-//runMinuteJob(config)()
+//setInterval(runMinuteJob(config), interval);
+runMinuteJob(config)()
