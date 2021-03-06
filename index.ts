@@ -12,7 +12,7 @@ import cron from 'node-cron';
 
 import threeCommasAPI from './commas';
 const interval = 1000*30;
-const version = '1.0.4';
+const version = '1.0.5';
 
 
 const getProfit = (message:string) => {
@@ -124,4 +124,6 @@ cron.schedule('30 * * * * *', () => {
     runJob(config);
 });
 
-app.listen(3000);
+const port = process.env.PORT || 3000;
+
+app.listen(port);
