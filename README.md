@@ -13,10 +13,9 @@ a history channel of all my history for a bot, and I also have a profit channel 
 {
     "users": [
         {
-            "3commasApiKey": "...",
-            "3commasSecret": "...",
-            "slackApiKey": "...",
-            "slackSecret": "...",
+            "commasApiKey": "...",
+            "commasSecret": "...",
+            "slackToken": "...",
             "botId": 2786356,
             "connections": [{
                 "connection": "history",
@@ -37,10 +36,8 @@ a history channel of all my history for a bot, and I also have a profit channel 
 `lastRan.json`
 ```
 {
-    "users": [{
-        "user1_api_key_goes_here_ababababab" : new Date(),
-        "user2_api_key_goes_here_ababababab" : new Date()
-    }]
+    "user1_api_key_goes_here_ababababab" : new Date(),
+    "user2_api_key_goes_here_ababababab" : new Date()
 }
 ```
 * The job calls 3commas api deals history per each user. 

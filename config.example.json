@@ -1,11 +1,21 @@
 {
     "users": [
         {
-            "3commasApiKey": "safdadsf",
-            "3commasSecret": "fasdsadf",
-            "slackApiKey": "asdfasdfas",
-            "slackSecret": "asldkfjasdf",
-            "botId": 5671
+            "commasApiKey": "...",
+            "commasSecret": "...",
+            "slackToken": "...",
+            "botId": 2786356,
+            "connections": [{
+                "connection": "history",
+                "source": "3commas",
+                "destination": "slack",
+                "channelName": "history"
+            },{
+                "connection": "profit",
+                "source": "3commas",
+                "destination": "slack",
+                "channelName": "profit"
+            }]
         }
     ]
 }

@@ -4,8 +4,11 @@
   "description": "Jarvis worker is an intelligent worker process that pings third party like 3commas and passes data to integrations like zapier, slack, or database",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.ts",
+    "build": "tsc --project ./"
   },
+  "nodemonConfig": { "ext": "js", "ignore": ["*.json", "lastRun/data/*"]},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jsgandalf/jarvis-worker.git"
@@ -15,5 +18,18 @@
   "bugs": {
     "url": "https://github.com/jsgandalf/jarvis-worker/issues"
   },
-  "homepage": "https://github.com/jsgandalf/jarvis-worker#readme"
+  "homepage": "https://github.com/jsgandalf/jarvis-worker#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@types/node": "^14.14.31",
+    "@types/node-fetch": "^2.5.8",
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "3commas-api-node": "^1.0.9",
+    "node-fetch": "^2.6.1",
+    "slack": "^11.0.2"
+  }
 }
