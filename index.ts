@@ -8,7 +8,7 @@ import defineLastRun from './lastRun/defineLastRun';
 import sendSlackMessage from './slack';
 
 const threeCommasAPI = require('./commas/');
-const interval = 1000;
+const interval = 1000*30;
 
 const getProfit = (message:string) => {
     const regex = /\+(.*?)USD/gm;
@@ -97,5 +97,5 @@ const runMinuteJob = (config:ConfigFile) => () => {
 
 defineLastRun(config);
 
-//setInterval(runMinuteJob(config), interval);
-runMinuteJob(config)()
+setInterval(runMinuteJob(config), interval);
+//runMinuteJob(config)()
