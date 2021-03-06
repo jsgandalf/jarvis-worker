@@ -4,12 +4,13 @@ import ConfigFile from './config/ConfigFile';
 import User from './user/user';
 import UserConfig from './user/UserConfig';
 import Connection from './user/Connection';
-import defineLastRun from './lastRun/defineLastRun';
 import sendSlackMessage from './slack';
 import database from './database';
+import express from 'express';
+import cron from 'node-cron';
+
 
 import threeCommasAPI from './commas';
-import { stringify } from 'querystring';
 const interval = 1000*30;
 const version = 1.3;
 
@@ -116,5 +117,13 @@ const test = () => {
 
 console.log(`deploying jarvis worker ${version}`);
 //setInterval(runMinuteJob(config), interval);
-runMinuteJob(config)();
+//runMinuteJob(config)();
 
+const app = express();
+
+// Schedule tasks to be run on the server.
+cron.schedule('* * * * * *', function() {
+    console.log('running a task every minute');
+});
+
+app.listen(3000);

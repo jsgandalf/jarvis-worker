@@ -10,7 +10,13 @@
     "gcp-build": "tsc -p .",
     "build": "tsc -p ."
   },
-  "nodemonConfig": { "ext": "js", "ignore": ["*.json", "lastRun/data/*"]},
+  "nodemonConfig": {
+    "ext": "js",
+    "ignore": [
+      "*.json",
+      "lastRun/data/*"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jsgandalf/jarvis-worker.git"
@@ -31,6 +37,8 @@
   },
   "dependencies": {
     "3commas-api-node": "^1.0.9",
+    "express": "^4.17.1",
+    "node-cron": "^2.0.3",
     "node-fetch": "^2.6.1",
     "slack": "^11.0.2"
   }
