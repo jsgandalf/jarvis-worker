@@ -11,6 +11,7 @@ import database from './database';
 import threeCommasAPI from './commas';
 import { stringify } from 'querystring';
 const interval = 1000*10;
+const version = 1.1;
 
 
 const getProfit = (message:string) => {
@@ -70,7 +71,7 @@ const runMinuteJob = (config:ConfigFile) => () => {
             const lastEvent = data.bot_events[0];
             const key = user.commasApiKey + String(user.botId);
             let lastRunDate = database.lastRun.get(key);
-            console.log(`lastRunDate=${lastRunDate}`);
+            console.log(`${version} lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
                 lastRunDate = new Date(lastEvent.created_at)
                 database.lastRun.set(key, new Date(lastEvent.created_at));
@@ -113,7 +114,7 @@ const test = () => {
     }
 }
 
-console.log("deploying jarvis worker");
+console.log(`deploying jarvis worker ${version}`);
 setInterval(runMinuteJob(config), interval);
 runMinuteJob(config)()
 
