@@ -32,8 +32,8 @@ a history channel of all my history for a bot, and I also have a profit channel 
     ]
 }
 ```
-* The job reads from a file that stores a dictionary/map of the user api key as the key and the last run date
-`lastRan.json`
+* The job reads from a map in memmory. It defines the user api as the key and the last run date as the value
+`lastRan in the database`
 ```
 {
     "user1_api_key_goes_here_ababababab" : new Date(),
@@ -41,4 +41,4 @@ a history channel of all my history for a bot, and I also have a profit channel 
 }
 ```
 * The job calls 3commas api deals history per each user. 
-* The job sends to slack everything after the last date recorded in the lastRan.json
+* The job sends to slack everything after the last date recorded in the lastRan

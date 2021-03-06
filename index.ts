@@ -11,7 +11,7 @@ import cron from 'node-cron';
 
 
 import threeCommasAPI from './commas';
-const version = '1.0.7';
+const version = '1.0.8';
 
 
 const getProfit = (message:string) => {
@@ -104,6 +104,8 @@ const runJob = (config:ConfigFile) => () => {
                         }
                     })
                 })
+        }).catch((e) => {
+            console.error(e);
         });
     });
 }
@@ -115,6 +117,11 @@ const test = () => {
 }
 
 console.log(`deploying jarvis worker v${version}`);
+
+if (config?.users?.length < 1){
+    throw 'Must define a user in the config';
+}
+
 
 const app = express();
 
