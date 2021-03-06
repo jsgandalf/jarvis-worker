@@ -11,8 +11,7 @@ import cron from 'node-cron';
 
 
 import threeCommasAPI from './commas';
-const interval = 1000*30;
-const version = '1.0.5';
+const version = '1.0.6';
 
 
 const getProfit = (message:string) => {
@@ -121,6 +120,7 @@ const app = express();
 
 // Schedule tasks to be run on the server.
 cron.schedule('30 * * * * *', () => {
+    console.log('running cron ', new Date());
     runJob(config);
 });
 
