@@ -11,7 +11,7 @@ import cron from 'node-cron';
 
 
 import threeCommasAPI from './commas';
-const version = '1.0.8';
+const version = '1.0.9';
 
 
 const getProfit = (message:string) => {
@@ -56,18 +56,20 @@ const updateLastRun = (event, key) => {
     database.lastRun.set(key, new Date(event.created_at));
 }
 
-const runJob = (config:ConfigFile) => () => {
-    config.users.forEach((userConfig:UserConfig) => {
+const runJob = async (config:ConfigFile) => {
+    let userConfig: UserConfig;
+    for (userConfig of config.users) {
         const user = new User(userConfig);
         const api = new threeCommasAPI({
             apiKey: user.commasApiKey,
             apiSecret: user.commasSecret,
         });
-        
-        api.botShow({
-            bot_id:user.botId,
-            include_events: true
-        }).then((data: any) => {
+        console.log('calling show bot for bot ', user.botId);
+        try {
+            const data = await api.botShow({
+                bot_id:user.botId,
+                include_events: true
+            });
             const lastEvent = data.bot_events[0];
             const key = user.commasApiKey + String(user.botId);
             let lastRunDate = database.lastRun.get(key);
@@ -79,40 +81,37 @@ const runJob = (config:ConfigFile) => () => {
             const botEvents = data.bot_events
                 .filter((e:any) =>  new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
                 .reverse();
-                botEvents.forEach((event: any) => {
-                    user.connections.forEach((connection: Connection) => {
-                        if(connection.connection === 'history'
-                            && connection.source === '3commas'
-                            && connection.destination === 'slack'
-                            && connection.channelName === 'history') {
-                                sendToSlackHistory(event.message, connection.channelName, user.slackToken).then((data: any)=>{
-                                    updateLastRun(event, key);
-                                }).catch((e: any) => {
-                                    console.error(e);
-                                });
-                        }
-                        if(connection.connection === 'profit'
-                            && connection.source === '3commas'
-                            && connection.destination === 'slack'
-                            && connection.channelName === 'profit'
-                            && event.message.search('#profit') !== -1) {
-                                sendToSlackProfit(event.message, connection.channelName, user.slackToken).then((data)=>{
-                                    updateLastRun(event, key);
-                                }).catch((e) => {
-                                    console.error(e);
-                                });
-                        }
-                    })
-                })
-        }).catch((e) => {
+            
+            for (let event of botEvents) {
+                let connection: Connection;
+                for (connection of user.connections) {
+                    let promises = [];
+                    if(connection.connection === 'history'
+                        && connection.source === '3commas'
+                        && connection.destination === 'slack'
+                        && connection.channelName === 'history') {
+                            promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
+                            updateLastRun(event, key);
+                    }
+                    if(connection.connection === 'profit'
+                        && connection.source === '3commas'
+                        && connection.destination === 'slack'
+                        && connection.channelName === 'profit'
+                        && event.message.search('#profit') !== -1) {
+                            promises.push(sendToSlackProfit(event.message, connection.channelName, user.slackToken));
+                    }
+                    await Promise.all(promises);
+                }
+            }
+        } catch(e) {
             console.error(e);
-        });
-    });
+        }
+    }
 }
 /* TODO: write a test to make sure this runs */
 const test = () => {
     const lastEvent = {
-        created_at: new Date(Date.UTC(2021, 2, 7, -7, 0, 0))
+        created_at: new Date(Date.UTC(2021, 2, 7, 0, 50, 0))
     }
 }
 
@@ -125,6 +124,7 @@ if (config?.users?.length < 1){
 
 const app = express();
 
+runJob(config);
 // Schedule tasks to be run on the server.
 cron.schedule('30 * * * * *', () => {
     console.log('running cron ', new Date());
