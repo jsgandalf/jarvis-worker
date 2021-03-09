@@ -84,7 +84,8 @@ const history = async (config:ConfigFile) => {
                     if(connection.connection === 'history'
                         && connection.source === '3commas'
                         && connection.destination === 'slack'
-                        && connection.channelName === 'history') {
+                        && connection.channelName === 'history'
+                        && event.message.search('Placing safety trade') === -1) {
                             promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
                             updateLastRun(key, new Date(event.created_at), database);
                     }
