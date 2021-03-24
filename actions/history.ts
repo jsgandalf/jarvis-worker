@@ -8,6 +8,20 @@ import version from '../version';
 import database from '../database';
 import config from '../config.json';
 
+const getSafetyTrade = (message:string) => {
+    const regex = /Safety trade (.*?) executed/gm;
+    const m = regex.exec(message);
+    let str;
+    if (m === null){
+        console.error('Could not find saftey trade message');
+        return;
+    }
+    if (m.length > 1) {
+        str = m[1];
+    }
+    return str;
+}
+
 
 const getProfit = (message:string) => {
     const regex = /\+(.*?)USD/gm;
@@ -41,10 +55,10 @@ const updateLastRun = (key, value, database) => {
     database.lastRun.set(key, value);
 }
 
-const sendToSlackProfit = (message:string, channel:string, slackToken:string) => {
+const sendToSlackProfit = (message:string, safetyTrade, channel:string, slackToken:string) => {
     const profit = getProfit(message);
     const time = getTime(message);
-    return sendSlackMessage(`$${profit} in ${time}`, channel, slackToken);
+    return sendSlackMessage(`$${profit} in ${time} executed ${safetyTrade}`, channel, slackToken);
 }
 
 const sendToSlackHistory = (message:string, channel:string, slackToken:string) => {
@@ -74,8 +88,15 @@ const history = async (config:ConfigFile) => {
                 updateLastRun(key, new Date(lastEvent.created_at), database);
             }
             const botEvents = data.bot_events
-                .filter((e:any) =>  new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
+                .filter((e:any) => new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
                 .reverse();
+
+            const botEventsSafety = data.bot_events
+                .filter((e:any) => e.message.search('Safety trade') !== -1)
+                .map(({message}) => message);
+
+        
+            const lastSafteyTrade = getSafetyTrade(botEventsSafety.find(x=>x!==undefined) || '');
             
             for (let event of botEvents) {
                 let connection: Connection;
@@ -94,7 +115,7 @@ const history = async (config:ConfigFile) => {
                         && connection.destination === 'slack'
                         && connection.channelName === 'profit'
                         && event.message.search('#profit') !== -1) {
-                            promises.push(sendToSlackProfit(event.message, connection.channelName, user.slackToken));
+                            promises.push(sendToSlackProfit(event.message, lastSafteyTrade, connection.channelName, user.slackToken));
                     }
                     await Promise.all(promises);
                     console.log('[history] done with promises')
