@@ -7,6 +7,7 @@ import UserConfig from "../user/UserConfig";
 import version from '../version';
 import database from '../database';
 import config from '../config.json';
+import e from "express";
 
 const getSafetyTrade = (message:string) => {
     const regex = /Safety trade (.*?) executed/gm;
@@ -55,7 +56,7 @@ const updateLastRun = (key, value, database) => {
     database.lastRun.set(key, value);
 }
 
-const sendToSlackProfit = (message:string, safetyTrade, channel:string, slackToken:string) => {
+const sendToSlackProfit = (message:string, safetyTrade:string, channel:string, slackToken:string) => {
     const profit = getProfit(message);
     const time = getTime(message);
     return sendSlackMessage(`$${profit} in ${time} executed ${safetyTrade}`, channel, slackToken);
@@ -63,6 +64,23 @@ const sendToSlackProfit = (message:string, safetyTrade, channel:string, slackTok
 
 const sendToSlackHistory = (message:string, channel:string, slackToken:string) => {
     return sendSlackMessage(message, channel, slackToken);
+}
+
+const getSafetyTradeMessage = (events, i) => {
+    let lastSafteyTrade = '(no saftey trades)';
+    let safetyTrade = false;
+    while(i < events.length) {
+        if(events[i].message.search('#profit') !== -1) {
+            safetyTrade = true;
+        }
+        if(events[i].message.search('Safety trade') !== -1 && safetyTrade) {
+            return getSafetyTrade(events[i].message);
+        }
+        if(events[i].message.search('Starting new deal') !== -1) {
+            return lastSafteyTrade;
+        }
+    }
+    return lastSafteyTrade;
 }
 
 const history = async (config:ConfigFile) => {
@@ -89,6 +107,7 @@ const history = async (config:ConfigFile) => {
             }
             const botEvents = data.bot_events
                 .filter((e:any) => new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
+                .filter((e:any) => e.message.search('Cancelling buy order') === -1 && e.message.search('Placing safety trade') === -1)
                 .reverse();
 
             const botEventsSafety = data.bot_events
@@ -96,8 +115,7 @@ const history = async (config:ConfigFile) => {
                 .map(({message}) => message);
 
         
-            const lastSafteyTrade = getSafetyTrade(botEventsSafety.find(x=>x!==undefined) || '');
-            
+            let i = 0;
             for (let event of botEvents) {
                 let connection: Connection;
                 for (connection of user.connections) {
@@ -105,8 +123,7 @@ const history = async (config:ConfigFile) => {
                     if(connection.connection === 'history'
                         && connection.source === '3commas'
                         && connection.destination === 'slack'
-                        && connection.channelName === 'history'
-                        && event.message.search('Placing safety trade') === -1) {
+                        && connection.channelName === 'history') {
                             promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
                             updateLastRun(key, new Date(event.created_at), database);
                     }
@@ -115,12 +132,15 @@ const history = async (config:ConfigFile) => {
                         && connection.destination === 'slack'
                         && connection.channelName === 'profit'
                         && event.message.search('#profit') !== -1) {
-                            promises.push(sendToSlackProfit(event.message, lastSafteyTrade, connection.channelName, user.slackToken));
+                            const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
+                            console.log(lastSafetyTrade);
+                            promises.push(sendToSlackProfit(event.message, lastSafetyTrade, connection.channelName, user.slackToken));
                     }
                     await Promise.all(promises);
                     console.log('[history] done with promises')
                 }
                 console.log('[history] done with events')
+                i+=1;
             }
         } catch(e) {
             console.error(e);
