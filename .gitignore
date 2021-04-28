@@ -24,4 +24,4 @@ yarn-error.log*
 config.json
 lastRun/data/lastRun.json
 yarn.lock
-package-lock.json
+.env
