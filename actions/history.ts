@@ -122,15 +122,13 @@ const history = async (config:ConfigFile) => {
                     let promises = [];
                     if(connection.connection === 'history'
                         && connection.source === '3commas'
-                        && connection.destination === 'slack'
-                        && connection.channelName === 'history') {
+                        && connection.destination === 'slack') {
                             promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
                             updateLastRun(key, new Date(event.created_at), database);
                     }
                     if(connection.connection === 'profit'
                         && connection.source === '3commas'
                         && connection.destination === 'slack'
-                        && connection.channelName === 'profit'
                         && event.message.search('#profit') !== -1) {
                             const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
                             console.log(lastSafetyTrade);
