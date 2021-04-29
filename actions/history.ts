@@ -137,16 +137,13 @@ const history = async (config:ConfigFile) => {
                             promises.push(sendToSlackProfit(event.message, lastSafetyTrade, connection.channelName, user.slackToken));
                     }
                     await Promise.all(promises);
-                    console.log('[history] done with promises')
                 }
-                console.log('[history] done with events')
                 i+=1;
             }
         } catch(e) {
             console.error(e);
         }
     }
-    console.log('[history] done with history')
 }
 
 /* TODO: write a test to make sure this runs */
