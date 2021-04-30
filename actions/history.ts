@@ -23,6 +23,9 @@ const getSafetyTrade = (message:string) => {
     return str;
 }
 
+const round = (num) => {
+    return Math.ceil(num * 100) / 100;
+}
 
 const getProfit = (message:string) => {
     const regex = /\+(.*?)USD/gm;
@@ -33,7 +36,8 @@ const getProfit = (message:string) => {
         return;
     }
     if (m.length > 1) {
-        profit = parseInt(m[1], 10);
+        profit = Number.parseFloat(m[1]);
+        profit = round(profit);
     }
     return profit;
 }
