@@ -56,10 +56,10 @@ const updateLastRun = (key, value, database) => {
     database.lastRun.set(key, value);
 }
 
-const sendToSlackProfit = (message:string, safetyTrade:string, channel:string, slackToken:string) => {
+const sendToSlackProfit = (message:string, channel:string, slackToken:string) => {
     const profit = getProfit(message);
     const time = getTime(message);
-    return sendSlackMessage(`$${profit} in ${time} executed ${safetyTrade}`, channel, slackToken);
+    return sendSlackMessage(`$${profit} in ${time}`, channel, slackToken);
 }
 
 const sendToSlackHistory = (message:string, channel:string, slackToken:string) => {
@@ -94,11 +94,17 @@ const history = async (config:ConfigFile) => {
         console.log('calling show bot for bot ', user.botId);
         try {
             const data = await api.botShow({
-                bot_id:user.botId,
+                bot_id: user.botId,
                 include_events: true
             });
             const lastEvent = data.bot_events[0];
             const key = user.commasApiKey + String(user.botId);
+            // To test 2 hours ago use the following and replace lastRunDate
+            // new Date(new Date().getTime() - ONE_HOUR*2)
+            // const ONE_HOUR = 60 * 60 * 1000;
+            // let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
+            //const ONE_HOUR = 60 * 60 * 1000;
+            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
             let lastRunDate = database.lastRun.get(key);
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
@@ -130,9 +136,9 @@ const history = async (config:ConfigFile) => {
                         && connection.source === '3commas'
                         && connection.destination === 'slack'
                         && event.message.search('#profit') !== -1) {
-                            const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
-                            console.log(lastSafetyTrade);
-                            promises.push(sendToSlackProfit(event.message, lastSafetyTrade, connection.channelName, user.slackToken));
+                            //const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
+                            //console.log(lastSafetyTrade);
+                            promises.push(sendToSlackProfit(event.message, connection.channelName, user.slackToken));
                     }
                     await Promise.all(promises);
                 }
