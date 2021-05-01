@@ -106,8 +106,6 @@ const history = async (config:ConfigFile) => {
             // To test 2 hours ago use the following and replace lastRunDate
             // new Date(new Date().getTime() - ONE_HOUR*2)
             // const ONE_HOUR = 60 * 60 * 1000;
-            // let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
-            //const ONE_HOUR = 60 * 60 * 1000;
             //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
             let lastRunDate = database.lastRun.get(key);
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
@@ -128,13 +126,15 @@ const history = async (config:ConfigFile) => {
             let i = 0;
             for (let event of botEvents) {
                 let connection: Connection;
+                let updated = false;
                 for (connection of user.connections) {
                     let promises = [];
+                    updated = false;
                     if(connection.connection === 'history'
                         && connection.source === '3commas'
                         && connection.destination === 'slack') {
                             promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
-                            updateLastRun(key, new Date(event.created_at), database);
+                            updated = true;
                     }
                     if(connection.connection === 'profit'
                         && connection.source === '3commas'
@@ -143,6 +143,11 @@ const history = async (config:ConfigFile) => {
                             //const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
                             //console.log(lastSafetyTrade);
                             promises.push(sendToSlackProfit(event.message, connection.channelName, user.slackToken));
+                            updated = true;
+                    }
+                    if (updated) {
+                        updateLastRun(key, new Date(event.created_at), database);
+                        updated = false;
                     }
                     await Promise.all(promises);
                 }
