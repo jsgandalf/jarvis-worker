@@ -11,6 +11,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
+// TODO remove bodyParser it is deprecated
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
