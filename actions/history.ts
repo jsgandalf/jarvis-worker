@@ -115,7 +115,9 @@ const history = async (config:ConfigFile) => {
             }
             const botEvents = data.bot_events
                 .filter((e:any) => new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
-                .filter((e:any) => e.message.search('Cancelling buy order') === -1 && e.message.search('Placing safety trade') === -1)
+                .filter((e:any) => e.message.search('Cancelling buy order') === -1 
+                    //&& e.message.search('Placing safety trade') === -1
+                )
                 .reverse();
 
             const botEventsSafety = data.bot_events
