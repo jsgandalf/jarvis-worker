@@ -3,4 +3,5 @@ export default interface Connection {
     source: string;
     destination: string;
     channelName: string;
+    isStockpiling?: Boolean;
 }

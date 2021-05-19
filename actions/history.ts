@@ -23,8 +23,40 @@ const getSafetyTrade = (message:string) => {
     return str;
 }
 
+const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const round = (num) => {
     return Math.ceil(num * 100) / 100;
+}
+
+const getProfitStockpilingUsd = (message:string) => {
+    const regex = /USD \((.*?) \$\)/gm;
+    const m = regex.exec(message);
+    let profit = '';
+    if (m === null){
+        console.error('Could not find profit number');
+        return;
+    }
+    if (m.length > 1) {
+        profit = m[1];
+    }
+    return profit;
+}
+
+const getProfitStockpiling = (message:string) => {
+    const regex = /Profit: \+(.*?) ([^\s]+)/gm;
+    const m = regex.exec(message);
+    let profit = 0;
+    if (m === null){
+        console.error('Could not find profit number');
+        return;
+    }
+    if (m.length > 1) {
+        profit = Number.parseFloat(m[1]);
+    }
+    return `${profit} ${m[2]} ($${getProfitStockpilingUsd(message)} USD)`;
 }
 
 const getProfit = (message:string) => {
@@ -60,10 +92,10 @@ const updateLastRun = (key, value, database) => {
     database.lastRun.set(key, value);
 }
 
-const sendToSlackProfit = (message:string, channel:string, slackToken:string) => {
-    const profit = getProfit(message);
+const sendToSlackProfit = (message:string, channel:string, slackToken:string, isStockpiling) => {
+    const profit = isStockpiling ? getProfitStockpiling(message) : '$' + getProfit(message);
     const time = getTime(message);
-    return sendSlackMessage(`$${profit} in ${time}`, channel, slackToken);
+    return sendSlackMessage(`${profit} in ${time}`, channel, slackToken);
 }
 
 const sendToSlackHistory = (message:string, channel:string, slackToken:string) => {
@@ -87,6 +119,9 @@ const getSafetyTradeMessage = (events, i) => {
     return lastSafteyTrade;
 }
 
+// To test 2 hours ago use the following and replace lastRunDate
+const ONE_HOUR = 60 * 60 * 1000;
+
 const history = async (config:ConfigFile) => {
     let userConfig: UserConfig;
     for (userConfig of config.users) {
@@ -103,9 +138,8 @@ const history = async (config:ConfigFile) => {
             });
             const lastEvent = data.bot_events[0];
             const key = user.commasApiKey + String(user.botId);
+            
             // To test 2 hours ago use the following and replace lastRunDate
-            // new Date(new Date().getTime() - ONE_HOUR*2)
-            // const ONE_HOUR = 60 * 60 * 1000;
             //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
             let lastRunDate = database.lastRun.get(key);
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
@@ -115,9 +149,7 @@ const history = async (config:ConfigFile) => {
             }
             const botEvents = data.bot_events
                 .filter((e:any) => new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
-                .filter((e:any) => e.message.search('Cancelling buy order') === -1 
-                    //&& e.message.search('Placing safety trade') === -1
-                )
+                .filter((e:any) => e.message.search('Cancelling buy order') === -1 && e.message.search('Placing safety trade') === -1)
                 .reverse();
 
             const botEventsSafety = data.bot_events
@@ -135,7 +167,7 @@ const history = async (config:ConfigFile) => {
                     if(connection.connection === 'history'
                         && connection.source === '3commas'
                         && connection.destination === 'slack') {
-                            promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
+                            //promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
                             updated = true;
                     }
                     if(connection.connection === 'profit'
@@ -144,7 +176,7 @@ const history = async (config:ConfigFile) => {
                         && event.message.search('#profit') !== -1) {
                             //const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
                             //console.log(lastSafetyTrade);
-                            promises.push(sendToSlackProfit(event.message, connection.channelName, user.slackToken));
+                            promises.push(sendToSlackProfit(event.message, connection.channelName, user.slackToken, connection?.isStockpiling));
                             updated = true;
                     }
                     if (updated) {
@@ -155,6 +187,7 @@ const history = async (config:ConfigFile) => {
                 }
                 i+=1;
             }
+            await sleep(5000);
         } catch(e) {
             console.error(e);
         }
