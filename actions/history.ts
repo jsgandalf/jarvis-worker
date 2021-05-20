@@ -167,7 +167,7 @@ const history = async (config:ConfigFile) => {
                     if(connection.connection === 'history'
                         && connection.source === '3commas'
                         && connection.destination === 'slack') {
-                            //promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
+                            promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
                             updated = true;
                     }
                     if(connection.connection === 'profit'
