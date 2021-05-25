@@ -1,4 +1,4 @@
 cron:
 - description: "Minute history job"
   url: /history
-  schedule: every 2 minutes
+  schedule: every 3 minutes

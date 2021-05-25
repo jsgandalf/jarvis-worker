@@ -187,7 +187,7 @@ const history = async (config:ConfigFile) => {
                 }
                 i+=1;
             }
-            await sleep(1000);
+            await sleep(5000);
         } catch(e) {
             console.error(e);
         }
