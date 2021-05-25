@@ -144,8 +144,10 @@ const history = async (config:ConfigFile) => {
             let lastRunDate = database.lastRun.get(key);
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
-                lastRunDate = new Date(lastEvent.created_at)
-                updateLastRun(key, new Date(lastEvent.created_at), database);
+                lastRunDate = new Date()
+                updateLastRun(key, new Date(), database);
+                await sleep(1000);
+                return;
             }
             const botEvents = data.bot_events
                 .filter((e:any) => new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
