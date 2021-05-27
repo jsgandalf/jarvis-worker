@@ -137,11 +137,11 @@ const history = async (config:ConfigFile) => {
                 include_events: true
             });
             const lastEvent = data.bot_events[0];
-            const key = user.commasApiKey + String(user.botId);
+            const key = String(user.botId);
             
             // To test 2 hours ago use the following and replace lastRunDate
-            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
-            let lastRunDate = database.lastRun.get(key);
+            let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
+            // let lastRunDate = database.lastRun.get(key);
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
                 lastRunDate = new Date()
@@ -154,10 +154,11 @@ const history = async (config:ConfigFile) => {
                 .filter((e:any) => e.message.search('Cancelling buy order') === -1 && e.message.search('Placing safety trade') === -1)
                 .reverse();
 
+            /*
             const botEventsSafety = data.bot_events
                 .filter((e:any) => e.message.search('Safety trade') !== -1)
                 .map(({message}) => message);
-
+            */
         
             let i = 0;
             for (let event of botEvents) {
@@ -166,26 +167,25 @@ const history = async (config:ConfigFile) => {
                 for (connection of user.connections) {
                     let promises = [];
                     updated = false;
-                    if(connection.connection === 'history'
+                    if (connection.connection === 'history'
                         && connection.source === '3commas'
                         && connection.destination === 'slack') {
-                            promises.push(sendToSlackHistory(event.message, connection.channelName, user.slackToken));
+                            await sendToSlackHistory(event.message, connection.channelName, user.slackToken);
                             updated = true;
                     }
-                    if(connection.connection === 'profit'
+                    if (connection.connection === 'profit'
                         && connection.source === '3commas'
                         && connection.destination === 'slack'
                         && event.message.search('#profit') !== -1) {
                             //const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
                             //console.log(lastSafetyTrade);
-                            promises.push(sendToSlackProfit(event.message, connection.channelName, user.slackToken, connection?.isStockpiling));
+                            await sendToSlackProfit(event.message, connection.channelName, user.slackToken, connection?.isStockpiling);
                             updated = true;
                     }
                     if (updated) {
                         updateLastRun(key, new Date(event.created_at), database);
                         updated = false;
                     }
-                    await Promise.all(promises);
                 }
                 i+=1;
             }
