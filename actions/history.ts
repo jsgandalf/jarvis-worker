@@ -142,14 +142,13 @@ const history = async (config:ConfigFile) => {
             // To test 2 hours ago use the following and replace lastRunDate
             //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
             let lastRunDate = database.lastRun.get(key);
-            console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
-                const lastEventDate = lastEvent?.created_at ? lastEvent.created_at : new Date();
-                lastRunDate = new Date(lastEventDate)
-                updateLastRun(key, lastRunDate, database);
+                lastRunDate = new Date()
+                updateLastRun(key, new Date(), database);
                 await sleep(1000);
                 return;
             }
+            console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             const botEvents = data.bot_events
                 .filter((e:any) => new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
                 .filter((e:any) => e.message.search('Cancelling buy order') === -1 && e.message.search('Placing safety trade') === -1)
