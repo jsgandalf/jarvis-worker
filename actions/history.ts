@@ -140,12 +140,13 @@ const history = async (config:ConfigFile) => {
             const key = String(user.botId);
             
             // To test 2 hours ago use the following and replace lastRunDate
-            let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
-            // let lastRunDate = database.lastRun.get(key);
+            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
+            let lastRunDate = database.lastRun.get(key);
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             if (!lastRunDate) {
-                lastRunDate = new Date()
-                updateLastRun(key, new Date(), database);
+                const lastEventDate = lastEvent?.created_at ? lastEvent.created_at : new Date();
+                lastRunDate = new Date(lastEventDate)
+                updateLastRun(key, lastRunDate, database);
                 await sleep(1000);
                 return;
             }
