@@ -60,7 +60,7 @@ const getProfitStockpiling = (message:string) => {
 }
 
 const getProfit = (message:string) => {
-    const regex = /\+(.*?)USD/gm;
+    const regex = /[\s\S]*\+(.*?) USD/gm;
     const m = regex.exec(message);
     let profit = 0;
     if (m === null){
