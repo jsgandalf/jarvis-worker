@@ -173,7 +173,6 @@ const history = async (config:ConfigFile) => {
                 if (updated) {
                     updateLastRun(key, new Date(event.created_at), database);
                 }
-                i++;
             }
         } catch(e) {
             console.error(e);
