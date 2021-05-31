@@ -140,13 +140,13 @@ const history = async (config:ConfigFile) => {
             const key = String(user.botId);
             
             // To test 2 hours ago use the following and replace lastRunDate
-            let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*.5);
-            //let lastRunDate = database.lastRun.get(key);
+            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*.5);
+            let lastRunDate = database.lastRun.get(key);
+            
             if (!lastRunDate) {
                 lastRunDate = new Date()
                 updateLastRun(key, new Date(), database);
-                await sleep(1000);
-                return;
+                continue;
             }
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             const botEvents = data.bot_events
@@ -154,13 +154,11 @@ const history = async (config:ConfigFile) => {
                 .filter((e:any) => e.message.search('Cancelling buy order') === -1 && e.message.search('Placing safety trade') === -1)
                 .reverse();
 
-            /*
-            const botEventsSafety = data.bot_events
-                .filter((e:any) => e.message.search('Safety trade') !== -1)
-                .map(({message}) => message);
-            */
-        
+            console.log('bot-events: ' + data.bot_events.length);
+            let i = 0;
             for (let event of botEvents) {
+                console.log(i)
+         
                 let updated = false;
                 user.connections
                     .filter(x => x.connection === 'history' && x.source === '3commas' && x.destination === 'slack')
@@ -178,8 +176,8 @@ const history = async (config:ConfigFile) => {
                 if (updated) {
                     updateLastRun(key, new Date(event.created_at), database);
                 }
+                i++;
             }
-            await sleep(1000);
         } catch(e) {
             console.error(e);
         }
