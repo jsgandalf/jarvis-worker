@@ -142,7 +142,7 @@ const history = async (config:ConfigFile) => {
             // To test 2 hours ago use the following and replace lastRunDate
             //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*4);
             let lastRunDate = database.lastRun.get(key);
-            
+            console.log(database.lastRun);
             if (!lastRunDate) {
                 lastRunDate = new Date()
                 updateLastRun(key, new Date(), database);
@@ -154,26 +154,21 @@ const history = async (config:ConfigFile) => {
                 .filter((e:any) => e.message.search('Cancelling buy order') === -1 && e.message.search('Placing safety trade') === -1)
                 .reverse();
 
-            console.log('bot-events: ' + data.bot_events.length);
+            console.log('bot-events: ' + botEvents.length);
             for (let event of botEvents) {
-                let updated = false;
                 user.connections
                     .filter(x => x.connection === 'history' && x.source === '3commas' && x.destination === 'slack')
                     .every(async (connection: Connection) => {
                         await sendToSlackHistory(event.message, connection.channelName, user.slackToken);
-                        updated = true;
                     });
 
                 user.connections
                     .filter(x => x.connection === 'profit' && x.source === '3commas' && x.destination === 'slack' && event.message.search('#profit') !== -1)
                     .every(async (connection: Connection) => {
                         await sendToSlackProfit(event.message, connection.channelName, user.slackToken, connection?.isStockpiling);
-                        updated = true;
                     });
-                if (updated) {
-                    updateLastRun(key, new Date(event.created_at), database);
-                }
             }
+            updateLastRun(key, new Date(), database);
         } catch(e) {
             console.error(e);
         }
