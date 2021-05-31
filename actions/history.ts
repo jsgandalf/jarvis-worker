@@ -140,7 +140,7 @@ const history = async (config:ConfigFile) => {
             const key = String(user.botId);
             
             // To test 2 hours ago use the following and replace lastRunDate
-            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*.5);
+            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*4);
             let lastRunDate = database.lastRun.get(key);
             
             if (!lastRunDate) {
@@ -155,10 +155,7 @@ const history = async (config:ConfigFile) => {
                 .reverse();
 
             console.log('bot-events: ' + data.bot_events.length);
-            let i = 0;
             for (let event of botEvents) {
-                console.log(i)
-         
                 let updated = false;
                 user.connections
                     .filter(x => x.connection === 'history' && x.source === '3commas' && x.destination === 'slack')
