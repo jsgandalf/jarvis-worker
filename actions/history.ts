@@ -140,8 +140,8 @@ const history = async (config:ConfigFile) => {
             const key = String(user.botId);
             
             // To test 2 hours ago use the following and replace lastRunDate
-            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*2);
-            let lastRunDate = database.lastRun.get(key);
+            let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*.5);
+            //let lastRunDate = database.lastRun.get(key);
             if (!lastRunDate) {
                 lastRunDate = new Date()
                 updateLastRun(key, new Date(), database);
@@ -160,34 +160,24 @@ const history = async (config:ConfigFile) => {
                 .map(({message}) => message);
             */
         
-            let i = 0;
             for (let event of botEvents) {
-                let connection: Connection;
                 let updated = false;
-                for (connection of user.connections) {
-                    let promises = [];
-                    updated = false;
-                    if (connection.connection === 'history'
-                        && connection.source === '3commas'
-                        && connection.destination === 'slack') {
-                            await sendToSlackHistory(event.message, connection.channelName, user.slackToken);
-                            updated = true;
-                    }
-                    if (connection.connection === 'profit'
-                        && connection.source === '3commas'
-                        && connection.destination === 'slack'
-                        && event.message.search('#profit') !== -1) {
-                            //const lastSafetyTrade = getSafetyTradeMessage(botEvents, i);
-                            //console.log(lastSafetyTrade);
-                            await sendToSlackProfit(event.message, connection.channelName, user.slackToken, connection?.isStockpiling);
-                            updated = true;
-                    }
-                    if (updated) {
-                        updateLastRun(key, new Date(event.created_at), database);
-                        updated = false;
-                    }
+                user.connections
+                    .filter(x => x.connection === 'history' && x.source === '3commas' && x.destination === 'slack')
+                    .every(async (connection: Connection) => {
+                        await sendToSlackHistory(event.message, connection.channelName, user.slackToken);
+                        updated = true;
+                    });
+
+                user.connections
+                    .filter(x => x.connection === 'profit' && x.source === '3commas' && x.destination === 'slack' && event.message.search('#profit') !== -1)
+                    .every(async (connection: Connection) => {
+                        await sendToSlackProfit(event.message, connection.channelName, user.slackToken, connection?.isStockpiling);
+                        updated = true;
+                    });
+                if (updated) {
+                    updateLastRun(key, new Date(event.created_at), database);
                 }
-                i+=1;
             }
             await sleep(1000);
         } catch(e) {
