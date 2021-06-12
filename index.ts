@@ -14,6 +14,7 @@ app.use(cors());
 // TODO remove bodyParser it is deprecated
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static('public'))
 
 if (config?.users?.length < 1){
     throw 'Must define a user in the config';

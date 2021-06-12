@@ -132,22 +132,25 @@ const history = async (config:ConfigFile) => {
         });
         console.log('calling show bot for bot ', user.botId);
         try {
+
+            const key = String(user.botId);
+            // To test 2 hours ago use the following and replace lastRunDate
+            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*4);
+            const lastRunDate = database.lastRun.get(key);
+            console.log(database.lastRun);
+            updateLastRun(key, new Date(), database);
+            if (!lastRunDate) {
+                continue;
+            }
+
             const data = await api.botShow({
                 bot_id: user.botId,
                 include_events: true
             });
-            const lastEvent = data.bot_events[0];
-            const key = String(user.botId);
+            // TODO code from lastEvent instead of saving the lastest date
+            // code to set the last event so no events are missed. Commented out because I have concurrency issues atm
+            // const lastEvent = data.bot_events[0];
             
-            // To test 2 hours ago use the following and replace lastRunDate
-            //let lastRunDate = new Date(new Date().getTime() - ONE_HOUR*4);
-            let lastRunDate = database.lastRun.get(key);
-            console.log(database.lastRun);
-            if (!lastRunDate) {
-                lastRunDate = new Date()
-                updateLastRun(key, new Date(), database);
-                continue;
-            }
             console.log(`[runJob][v${version}] lastRunDate=${lastRunDate}`);
             const botEvents = data.bot_events
                 .filter((e:any) => new Date(e.created_at).valueOf() > new Date(lastRunDate).valueOf())
@@ -168,7 +171,6 @@ const history = async (config:ConfigFile) => {
                         await sendToSlackProfit(event.message, connection.channelName, user.slackToken, connection?.isStockpiling);
                     });
             }
-            updateLastRun(key, new Date(), database);
         } catch(e) {
             console.error(e);
         }
