@@ -1,3 +1,4 @@
+globalminer phoenixminer
 maxgputemp 85
 stratumproxy miner
 proxywallet 0xd49A723Ad220B5494C6ddD56F06Fc15793C0AF14
