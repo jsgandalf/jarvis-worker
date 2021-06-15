@@ -3,7 +3,7 @@ globalcore 1180
 globalvolt 950
 maxgputemp 85
 stratumproxy miner
-proxywallet 0xd49A723Ad220B5494C6ddD56F06Fc15793C0AF14/meetseanthomas@gmail.com
+proxywallet 0xd49A723Ad220B5494C6ddD56F06Fc15793C0AF14
 proxypool1 pool-usa.ethosdistro.com:5001
 proxypool2 pool-eu.ethosdistro.com:5001
 flags --cl-global-work 8192 --farm-recheck 200
