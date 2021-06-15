@@ -1,3 +1,4 @@
+poolemail meetseanthomas@gmail.com
 globalminer phoenixminer
 globalcore 1180
 globalvolt 950
