@@ -22,7 +22,7 @@ export default (req, res) => {
     const reqToken = req.body.token;
     const reqBotId = req.body.botId;
     const reqPair = req.body.pair;
-
+    const reqCyberBull = req.body.cyberbull;
     // check for a passed token
     if(!reqToken) return res.status(400).send('provide a token');
 
@@ -32,9 +32,14 @@ export default (req, res) => {
         apiKey: process.env.THREE_COMMAS_API_KEY,
         apiSecret: process.env.THREE_COMMAS_API_SECRET,
     };
+    if (reqCyberBull) {
+        creds.apiKey = process.env.THREE_COMMAS_API_KEY_CYBERBULL;
+        creds.apiSecret = process.env.THREE_COMMAS_API_SECRET_CYBERBULL;
+    }
     const api = new threeCommasAPI(creds);
     const promises = Array.isArray(reqBotId) ? reqBotId.map(id => startNewDeal(id, reqPair, api)) : [startNewDeal(reqBotId, reqPair, api)];
     Promise.all(promises).then((data) => {
+        console.log(data);
         //@ts-ignore
         if(data.error && data.error !== '') {
             //@ts-ignore
