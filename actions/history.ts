@@ -7,7 +7,6 @@ import UserConfig from "../user/UserConfig";
 import version from '../version';
 import database from '../database';
 import config from '../config.json';
-import e from "express";
 
 const getSafetyTrade = (message:string) => {
     const regex = /Safety trade (.*?) executed/gm;
