@@ -1,3 +1,3 @@
 export default (req, res) =>{
-    return res.status(200).send('ok');
+    return res.status(200).json({OK: "OK"});
 }
