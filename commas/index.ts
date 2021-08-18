@@ -195,6 +195,14 @@ export default class threeCommasAPI {
    * Accounts methods
    */
 
+  async getAccountSummary () {
+    return await this.makeRequest('GET', `/public/api/ver1/accounts/summary`, null)
+  }
+  async getAccount (accountId) {
+    return await this.makeRequest('GET', `/public/api/ver1/accounts/${accountId}`, null)
+
+  }
+
   async accountsNew (params: any) {
     return await this.makeRequest('POST', `/public/api/ver1/accounts/new?`, params)
   }

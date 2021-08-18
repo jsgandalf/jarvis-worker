@@ -1,29 +1,16 @@
 const fs = require('fs');
 const path = require('path');
-import threeCommasAPI from '3commas-api-node';
+import threeCommasAPI from "../commas";
 
-const startNewDeal = (botId, reqPair, api) => {
-    const payload = {
-        bot_id: botId,
-    }
-    if (reqPair) {
-        //@ts-ignore
-        payload.pair = reqPair;
-    }
-    return api.botStartNewDeal(payload)
-}
-
-const getProfit = body => {
-    const reqToken = body.token;
-    const reqBotId = body.botId;
-    const reqPair = body.pair;
-    const reqKey = body.key;
-    const reqSecret = body.secret;
+const getProfit = async query => {
+    const reqToken = query.token;
+    const reqKey = query.key;
+    const reqSecret = query.secret;
     // check for a passed token
     if (!reqToken) throw new Error('provide a token');
 
     // validate token
-    if (process.env.token !== reqToken) throw new Error('unauthorized');
+    if (process.env.APPLE_WATCH_TOKEN !== reqToken) throw new Error('unauthorized');
     const creds = {
         apiKey: process.env.THREE_COMMAS_API_KEY,
         apiSecret: process.env.THREE_COMMAS_API_SECRET,
@@ -32,33 +19,36 @@ const getProfit = body => {
         creds.apiKey = process.env[reqKey];
         creds.apiSecret = process.env[reqSecret];
     }
+
     const api = new threeCommasAPI(creds);
-    const promises = Array.isArray(reqBotId) ? reqBotId.map(id => startNewDeal(id, reqPair, api)) : [startNewDeal(reqBotId, reqPair, api)];
-    return Promise.all(promises);
+    const stats = await Promise.all([
+        api.getBotsStats({ account_id: 29518185, bot_id: 4427236}),
+        api.getBotsStats({ account_id: 29518185, bot_id: 5023500})
+    ]);
+    // check for errors
+    if (stats.length > 1 && stats[0].error && stats[0].error !== ''){
+        //@ts-ignore
+        throw new Error(data.error);
+    }
+    return stats
+        .map(e => e.profits_in_usd.today_usd_profit)
+        .reduce((prev, curr) => {
+            return prev + curr;
+        }, 0);
 }
 
 
 export default async (req, res) => {
     
     // check if there is a payload
-    if(!req.body) return res.status(400).send('provide a body');
+    if(!req.query) return res.status(400).send('provide a query string params');
     try {
-        let promises;
-        if (Array.isArray(req.body) && req.body.length > 0) {
-            promises = req.body.map((payload => getProfit(payload)));
-        } else {
-            promises.push(getProfit(req.body));
-        }
-        const data = await Promise.all(promises);
-        console.log(data);
+        const data = await getProfit(req.query)
         //@ts-ignore
-        if (data.error && data.error !== '') {
-            //@ts-ignore
-            throw new Error(data.error);
-        }
-        return res.status(200).send(data);
+        return res.status(200).send({profit: data});
     } catch (e) {
         if (e === 'unauthorized') return res.status(403);
+        console.log(e);
         return res.status(400).send(e.message);
     }
 }
