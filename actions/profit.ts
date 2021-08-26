@@ -22,8 +22,10 @@ const getProfit = async query => {
 
     const api = new threeCommasAPI(creds);
     const stats = await Promise.all([
-        api.getBotsStats({ account_id: 29518185, bot_id: 4427236}),
-        api.getBotsStats({ account_id: 29518185, bot_id: 5023500})
+        api.getBotsStats({ account_id: 29518185, bot_id: 5660329}),
+        api.getBotsStats({ account_id: 29518185, bot_id: 5582911}),
+        api.getBotsStats({ account_id: 29518185, bot_id: 5023500}),
+        api.getBotsStats({ account_id: 29518185, bot_id: 4427236})
     ]);
     // check for errors
     if (stats.length > 1 && stats[0].error && stats[0].error !== ''){
