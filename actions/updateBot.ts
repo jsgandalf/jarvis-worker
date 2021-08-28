@@ -2,28 +2,38 @@ const fs = require('fs');
 const path = require('path');
 import threeCommasAPI from '3commas-api-node';
 
-const updateBot = (api, reqBotId, pairs) => {
-    const orderType = 'percent';
-    const base_order_volume = 1.9;
-    const base_order_volume_type = orderType;
-    const max_active_deals = 1;
-    const take_profit = 0.4;
-    const safety_order_volume = 0.37;
-    const safety_order_volume_type = orderType;
-    const max_safety_orders = 8;
-    const active_safety_orders_count = 8;
-    const trailing_enabled = false;
-    const strategy = 'long';
-    const safety_order_step_percentage = 0.21;
-    const take_profit_type = 'total';
-    const strategy_list = JSON.stringify([{ "strategy": "manual" }]);
-    const profit_currency = 'quote_currency'; // can be 'base_currency'
-    const start_order_type = 'limit';
-    const martingale_step_coefficient = 1.6;
-    const martingale_volume_coefficient = 2.0;
+const getBot = (api, reqBotId) => {
+    return api.botShow(reqBotId);
+}
+
+const updateBot = (api, bot, reqUseTradingView) => {
+
+    const strategy_list = reqUseTradingView ? 
+        JSON.stringify([{'options':{'time':'5m', 'type':'buy_or_strong_buy'}, 'strategy':'trading_view'}]) :
+        JSON.stringify([{ "strategy": "manual" }]);
+
+    const bot_id = bot.id;
+    const name = bot.name;
+    const pairs = bot.pairs;
+    const base_order_volume = bot.base_order_volume;
+    const base_order_volume_type = bot.base_order_volume_type;
+    const max_active_deals = bot.max_active_deals;
+    const take_profit = bot.take_profit;
+    const safety_order_volume = bot.safety_order_volume;
+    const safety_order_volume_type = bot.safety_order_volume_type;
+    const max_safety_orders = bot.max_safety_orders;
+    const active_safety_orders_count = bot.active_safety_orders_count;
+    const trailing_enabled = bot.trailing_enabled;
+    const strategy = bot.strategy;
+    const safety_order_step_percentage = bot.safety_order_step_percentage;
+    const take_profit_type = bot.take_profit_type;
+    const profit_currency = bot.profit_currency;
+    const start_order_type = bot.start_order_type;
+    const martingale_step_coefficient = bot.martingale_step_coefficient;
+    const martingale_volume_coefficient = bot.martingale_volume_coefficient;
     return api.botUpdate({
-        bot_id: reqBotId,
-        name: 'Composite ADA, BNB, ETH, BTC, LTC',
+        bot_id,
+        name,
         pairs,
         max_active_deals,
         base_order_volume,
@@ -54,8 +64,7 @@ export default (req, res) => {
     const reqToken = req.body.token;
     const reqBotId = req.body.botId;
     const reqPair = req.body.pair;
-
-    const pairs = 'USD_ADA, USD_BNB, USD_BTC, USD_ETH, USD_LTC';
+    const reqUseTradingView = req.body.useTradingView;
 
     // check for a passed token
     if(!reqToken) return res.status(400).send('provide a token');
@@ -67,8 +76,9 @@ export default (req, res) => {
         apiSecret: process.env.THREE_COMMAS_API_SECRET,
     };
     const api = new threeCommasAPI(creds);
-
-    return updateBot(api, reqBotId, pairs).then((data) => {
+    return getBot(api, reqBotId).then((bot) => {
+        return updateBot(api, bot, reqUseTradingView);
+    }).then((data) => {
         console.log(data);
         //@ts-ignore
         if(data.error && data.error !== '') {
@@ -80,5 +90,4 @@ export default (req, res) => {
         console.error(error);
         return res.send(error);
     });
-    return res.status(501);
 }
