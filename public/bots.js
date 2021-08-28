@@ -89,6 +89,13 @@ const getBotStatus = async () => {
   renderCard('Alex-Strategy', strategyAlex);
   setStrategy(strategyAlex);
   enableButton();
+  if (getStrategy()) {
+    $('#Strategy-Button').addClass('btn-success');
+    $('#Strategy-Button').removeClass('btn-danger');
+  } else {
+    $('#Strategy-Button').addClass('btn-danger');
+    $('#Strategy-Button').removeClass('btn-success');
+  }
   //trading_view or manual
 }
 
