@@ -5,7 +5,9 @@ import signalAction from './actions/signal';
 import profitAction from './actions/profit';
 import updateBot from './actions/updateBot';
 import login from './actions/login';
-import createBot from './actions/createBot';
+import dashboard from './actions/dashboard';
+import botStrategy from './actions/botStrategy';
+import auth from './middleware/auth';
 
 export default app => {
     app.get('/history', historyAction);
@@ -13,8 +15,8 @@ export default app => {
     app.get('/profit', profitAction);
     app.get('/', rootAction);
     app.post('/', signalAction);
-    // Comment back in when you want to modify bots
-    app.put('/bot', updateBot);
     app.post('/login', login);
-    //app.post('/bot', createBot);
+    app.get('/dashboard', dashboard);
+    app.get('/bot/strategy', auth, botStrategy);
+    app.put('/bot/strategy', auth, updateBot);
 }

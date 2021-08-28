@@ -7,14 +7,15 @@ const getBot = (api, reqBotId) => {
 }
 
 const updateBot = (api, bot, reqUseTradingView) => {
-
-    const strategy_list = reqUseTradingView ? 
-        JSON.stringify([{'options':{'time':'5m', 'type':'buy_or_strong_buy'}, 'strategy':'trading_view'}]) :
+    
+    const strategy_list = JSON.parse(reqUseTradingView) ? 
+        JSON.stringify([{'options':{'time':'1m', 'type':'buy_or_strong_buy'}, 'strategy':'trading_view'}]) :
         JSON.stringify([{ "strategy": "manual" }]);
 
+    
     const bot_id = bot.id;
     const name = bot.name;
-    const pairs = bot.pairs;
+    const pairs = JSON.stringify(bot.pairs);
     const base_order_volume = bot.base_order_volume;
     const base_order_volume_type = bot.base_order_volume_type;
     const max_active_deals = bot.max_active_deals;
@@ -60,29 +61,27 @@ export default (req, res) => {
     // check if there is a payload
     if(!req.body) return res.status(400).send('provide a body');
 
-    console.log(req.body)
-    const reqToken = req.body.token;
     const reqBotId = req.body.botId;
-    const reqPair = req.body.pair;
     const reqUseTradingView = req.body.useTradingView;
+    const reqKey = req.body.key;
+    const reqSecret= req.body.secret;
 
-    // check for a passed token
-    if(!reqToken) return res.status(400).send('provide a token');
-
-    // validate token
-    if (process.env.token !== reqToken) return res.status(403);
     const creds = {
         apiKey: process.env.THREE_COMMAS_API_KEY,
         apiSecret: process.env.THREE_COMMAS_API_SECRET,
     };
+    if (reqKey && reqSecret) {
+        creds.apiKey = process.env[reqKey];
+        creds.apiSecret = process.env[reqSecret];
+    }
     const api = new threeCommasAPI(creds);
     return getBot(api, reqBotId).then((bot) => {
         return updateBot(api, bot, reqUseTradingView);
     }).then((data) => {
-        console.log(data);
         //@ts-ignore
         if(data.error && data.error !== '') {
             //@ts-ignore
+            console.error(data)
             throw data.error;
         }
         res.status(200).send(data);

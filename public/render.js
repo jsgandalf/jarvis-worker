@@ -1,15 +1,10 @@
 
 const render = () => {
   const authenticated = sessionStorage.getItem('token');
-  
-  $('#Header').hide();
-  $('#Dashboard').hide();
-  $('#Signin').hide();
-  if (authenticated) {
-    $('#Header').show();
-    $('#Dashboard').show();
-  } else {
-    $('#Signin').show();
+  const href =  window.location.href;
+  if (!authenticated && href.indexOf('dashboard') !== -1) window.location = '/';
+  if (authenticated && href.indexOf('dashboard') === -1) {
+    window.location = '/dashboard';
   }
 }
 
