@@ -10,7 +10,7 @@ export default (req, res) =>{
 
         const token = jwt.sign({
             data: reqEmail
-          }, process.env.SECRET, { expiresIn: '24h' });
+          }, process.env.SECRET, { expiresIn: '500h' });
 
         //@ts-ignore
         return res.status(200).json(token);
