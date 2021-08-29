@@ -5,13 +5,15 @@ import router from './router';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv'
+const path = require('path');
+
 dotenv.config();
 
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.set('views', __dirname + '/public/pages');
+app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
