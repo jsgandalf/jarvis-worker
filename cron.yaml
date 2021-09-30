@@ -1,4 +1,0 @@
-#cron:
-#- description: "Minute history job"
-#  url: /history
-#  schedule: every 3 minutes
