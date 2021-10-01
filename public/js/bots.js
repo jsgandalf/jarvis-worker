@@ -1,4 +1,4 @@
-
+const loginEndpoint = config.env === 'prod'? config.host : config.localServer;
 
 async function updateBotStrategy(botId, useTradingView=false, key=false, secret=false) {
 
@@ -6,13 +6,15 @@ async function updateBotStrategy(botId, useTradingView=false, key=false, secret=
     encodeURI(`botId=${botId}&useTradingView=${useTradingView}&key=${key}&secret=${secret}`) :
     encodeURI(`botId=${botId}&useTradingView=${useTradingView}`);
 
-  const endpoint = `/bot/strategy`;
+  const endpoint = `${loginEndpoint}/bot/strategy`;
+
+  const headers = new Headers();
+  headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+  headers.append('x-auth', `${sessionStorage.getItem('token')}`);
+
   const response = await fetch(endpoint, {
     method: 'put',
-    headers: {
-      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-      "Authorization": `Bearer ${sessionStorage.getItem('token')}`
-    },
+    headers,
     body
   })
   if (response.status === 200) {
@@ -29,16 +31,17 @@ async function getBotStrategy(botId, key=false, secret=false) {
     encodeURI(`botId=${botId}&key=${key}&secret=${secret}`) :
     encodeURI(`botId=${botId}`);
 
-  const endpoint = `/bot/strategy?${body}`;
+  const endpoint = `${loginEndpoint}/bot/strategy?${body}`;
+  const headers = new Headers();
+  headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+  headers.append('x-auth', `${sessionStorage.getItem('token')}`);
   const response = await fetch(endpoint, {
     method: 'get',
-    headers: {
-      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-      "Authorization": `Bearer ${sessionStorage.getItem('token')}`
-    }
+    headers
   })
   if (response.status === 200) {
     const result = await response.json();
+    console.log(result);
     return result;
   } else {
     alert('Something went wrong with your request');
@@ -77,12 +80,14 @@ const seansBotId = 5023500
 const alexBotId = 5430456
 const alexKey = 'THREE_COMMAS_API_KEY_NALDER';
 const alexSecret = 'THREE_COMMAS_API_SECRET_NALDER';
+const seanKey = 'SEAN_THREE_COMMAS_API_KEY';
+const seanSecret = 'SEAN_THREE_COMMAS_API_SECRET';
 const MANUAL = 'manual';
 const TRADING_VIEW = 'trading_view';
 
 const getBotStatus = async () => {
   disableButton();
-  const strategySean = await getBotStrategy(seansBotId);
+  const strategySean = await getBotStrategy(seansBotId, seanKey, seanSecret);
   const strategyAlex = await getBotStrategy(alexBotId, alexKey, alexSecret);
   renderButton(strategyAlex);
   renderCard('Sean-Strategy', strategySean);
@@ -102,7 +107,7 @@ const getBotStatus = async () => {
 const clickUpdateBotStrategy = async () => {
   disableButton();
   const useTradingView = !(JSON.parse(getStrategy()));
-  await updateBotStrategy(seansBotId, useTradingView);
+  await updateBotStrategy(seansBotId, useTradingView, seanKey, seanSecret);
   await updateBotStrategy(alexBotId, useTradingView, alexKey, alexSecret);
   getBotStatus();
 }

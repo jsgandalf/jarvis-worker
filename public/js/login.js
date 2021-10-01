@@ -1,17 +1,17 @@
-const loginEndpoint = '/login';
+const loginEndpoint = config.env === 'prod'? `${config.host}/login` : `${config.localServer}/login`;
 
 async function basiclogin(email, password) {
   const body = encodeURI(`email=${email}&password=${password}`);
   const response = await fetch(loginEndpoint, {
     method: 'post',
     headers: {
-      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+      'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     body
   })
-  if (response.status === 200){
+  if (response.status === 200) {
     const result = await response.json();
-    sessionStorage.setItem('token', result);
+    sessionStorage.setItem('token', result.token);
   } else {
     alert('wrong email and password');
   }
@@ -25,3 +25,7 @@ startLogin = () => {
   const password = document.getElementById('Password').value;
   basiclogin(email, password);
 }
+
+$('#Sign-In-Button').click(()=>{
+  startLogin()
+})
