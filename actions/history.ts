@@ -185,7 +185,7 @@ const test = () => {
 
 const historyAction = async (req, res) => {
     try {
-        await history(config);
+        //await history(config);
         return res.status(200).send('Done');
     } catch(e) {
         console.error(e);
