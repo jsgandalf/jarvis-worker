@@ -6,7 +6,7 @@ import User from "../user/user";
 import UserConfig from "../user/UserConfig";
 import version from '../version';
 import database from '../database';
-import config from '../config.json';
+//import config from '../config.json';
 
 const getSafetyTrade = (message:string) => {
     const regex = /Safety trade (.*?) executed/gm;
