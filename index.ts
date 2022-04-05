@@ -1,4 +1,4 @@
-import config from './config.json';
+//import config from './config.json';
 import express from 'express';
 import version from './version';
 import router from './router';
@@ -7,7 +7,7 @@ import cors from 'cors';
 import dotenv from 'dotenv'
 
 const path = require('path');
-dotenv.config();
+//dotenv.config();
 
 
 const app = express();
@@ -21,10 +21,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static('public'))
 
-
+/*
 if (config?.users?.length < 1){
     throw 'Must define a user in the config';
-}
+}*/
 
 router(app);
 
