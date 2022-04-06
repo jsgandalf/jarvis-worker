@@ -55,7 +55,7 @@ export default async (req, res) => {
         //@ts-ignore
         if (data.error && data.error !== '') {
             //@ts-ignore
-            throw new Error(data.error);
+            throw new Error(`${req.body.key} ${req.body.secret} ${data.error}`);
         }
         return res.status(200).send(data);
     } catch (e) {

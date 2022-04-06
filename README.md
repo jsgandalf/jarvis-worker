@@ -42,3 +42,9 @@ a history channel of all my history for a bot, and I also have a profit channel 
 ```
 * The job calls 3commas api deals history per each user. 
 * The job sends to slack everything after the last date recorded in the lastRan
+
+## Installing google cloud
+* Install google cloud in home directory of mac
+
+## Set the projectId
+* ```~/./google-cloud-sdk/bin/gcloud config set project jarvis-306805```

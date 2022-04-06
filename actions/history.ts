@@ -122,6 +122,7 @@ const getSafetyTradeMessage = (events, i) => {
 const ONE_HOUR = 60 * 60 * 1000;
 
 const history = async (config:ConfigFile) => {
+    throw 'history not allowed';
     let userConfig: UserConfig;
     for (userConfig of config.users) {
         const user = new User(userConfig);
