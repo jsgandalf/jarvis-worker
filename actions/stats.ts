@@ -6,7 +6,6 @@ import User from "../user/user";
 import UserConfig from "../user/UserConfig";
 import version from '../version';
 import database from '../database';
-import { exception } from "console";
 
 const getProfit = (message:string) => {
     const regex = /\+(.*?)USD/gm;
