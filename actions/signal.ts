@@ -51,7 +51,6 @@ export default async (req, res) => {
             promises.push(processDeal(req.body));
         }
         const data = await Promise.all(promises);
-        console.log(data);
         //@ts-ignore
         if (data.error && data.error !== '') {
             //@ts-ignore
