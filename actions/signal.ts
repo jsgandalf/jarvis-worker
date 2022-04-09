@@ -54,7 +54,10 @@ export default async (req, res) => {
         //@ts-ignore
         if (data.error && data.error !== '') {
             //@ts-ignore
-            throw new Error(`[signal] ${req.body.botId} ${req.body.key} ${req.body.secret} ${data.error}`);
+            const msg = `[signal] ${req.body.botId} ${req.body.key} ${req.body.secret} ${data.error}`;
+            console.error(msg);
+            //@ts-ignore
+            throw new Error(msg);
         }
         return res.status(200).send(data);
     } catch (e) {

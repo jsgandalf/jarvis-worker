@@ -48,3 +48,6 @@ a history channel of all my history for a bot, and I also have a profit channel 
 
 ## Set the projectId
 * ```~/./google-cloud-sdk/bin/gcloud config set project jarvis-306805```
+
+## Deploy the app
+* ```~/./google-cloud-sdk/bin/gcloud app deploy```
